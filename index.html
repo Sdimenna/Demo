@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="it" data-kind="estetica">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Prenota online</title>
+<meta name="description" content="Anteprima di un sito con prenotazione online per centri estetici e parrucchieri.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="ribbon" id="ribbon">
+  <p><span id="ribbon-text">Anteprima creata da Siro. Non è il sito ufficiale.</span></p>
+  <a href="#pannello" class="ribbon-link" id="ribbon-link">Vedi il pannello del salone</a>
+</div>
+
+<!-- ===================== SITO DEL SALONE ===================== -->
+<div id="site">
+  <header class="top">
+    <a href="#" class="brand" id="brand-small"></a>
+    <button class="btn btn-primary btn-sm" data-open-booking>Prenota</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="hero-kicker" id="hero-kicker"></p>
+      <h1 class="hero-name" id="hero-name"></h1>
+      <p class="hero-lead" id="hero-lead"></p>
+
+      <div class="slots-now">
+        <p class="slots-now-title">Primi orari liberi</p>
+        <div class="slots-now-list" id="next-slots"></div>
+        <button class="btn btn-primary btn-wide" data-open-booking>Prenota un appuntamento</button>
+        <p class="hint">Scegli trattamento, giorno e orario. Ci vogliono 30 secondi, anche alle 11 di sera.</p>
+      </div>
+    </section>
+
+    <section class="menu" id="trattamenti">
+      <h2 class="section-title">Trattamenti e prezzi</h2>
+      <div id="menu"></div>
+      <p class="fineprint">Listino di esempio: nella versione reale ci sono i trattamenti e i prezzi del salone.</p>
+    </section>
+
+    <section class="info">
+      <h2 class="section-title">Orari</h2>
+      <table class="hours" id="hours"></table>
+      <div class="info-actions">
+        <button class="btn btn-ghost" data-fake="whatsapp">Scrivici su WhatsApp</button>
+        <button class="btn btn-ghost" data-fake="call">Chiama</button>
+      </div>
+    </section>
+
+    <section class="pitch" id="pitch">
+      <h2 id="pitch-title">Ti piacerebbe un sito così?</h2>
+      <p id="pitch-text">Lo preparo io con i tuoi trattamenti, i tuoi prezzi e i tuoi orari. Le clienti prenotano da sole dal telefono e tu ti ritrovi tutto in agenda. Sono di Chiuppano: se serve qualcosa passo di persona.</p>
+      <ul class="pitch-list">
+        <li>Prenotazioni online 24 ore su 24, senza telefonate</li>
+        <li>Promemoria su WhatsApp alla cliente il giorno prima</li>
+        <li>Agenda sul telefono, con l'elenco delle clienti</li>
+        <li>Sito con il tuo nome, non una pagina su un portale insieme ai concorrenti</li>
+      </ul>
+      <a class="btn btn-light btn-wide" id="pitch-wa" target="_blank" rel="noopener">Scrivi a Siro su WhatsApp</a>
+      <p class="pitch-sign">Siro Leon di Menna, sviluppatore web · 345 210 6846</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p id="foot-name"></p>
+    <p class="fineprint">Demo realizzata da Siro Leon di Menna. I dati inseriti restano solo su questo telefono.</p>
+  </footer>
+</div>
+
+<!-- ===================== PANNELLO DEL SALONE ===================== -->
+<div id="admin" hidden>
+  <header class="admin-top">
+    <div>
+      <p class="admin-label">Pannello del salone</p>
+      <p class="admin-name" id="admin-name"></p>
+    </div>
+    <a href="#" class="btn btn-ghost btn-sm">Torna al sito</a>
+  </header>
+
+  <div class="admin-new" id="admin-new" hidden></div>
+
+  <section class="admin-stats" id="admin-stats"></section>
+
+  <section class="agenda">
+    <div class="agenda-nav">
+      <button class="icon-btn" id="day-prev" aria-label="Giorno precedente">‹</button>
+      <h2 id="agenda-day"></h2>
+      <button class="icon-btn" id="day-next" aria-label="Giorno successivo">›</button>
+    </div>
+    <ol class="agenda-list" id="agenda-list"></ol>
+  </section>
+
+  <p class="fineprint admin-foot">Dati di esempio. Nella versione reale l'agenda si sincronizza anche con il calendario di iPhone e Android.
+    <button class="linklike" id="reset-demo">Ricomincia la demo</button></p>
+</div>
+
+<!-- ===================== PRENOTAZIONE ===================== -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="sheet-head">
+      <button class="icon-btn" id="sheet-back" aria-label="Indietro">‹</button>
+      <p class="sheet-steps" id="sheet-steps"></p>
+      <button class="icon-btn" data-close aria-label="Chiudi">×</button>
+    </div>
+    <h2 class="sheet-title" id="sheet-title"></h2>
+    <div class="sheet-body" id="sheet-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="salons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
