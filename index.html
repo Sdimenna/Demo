@@ -48,6 +48,7 @@
     <section class="info">
       <h2 class="section-title">Orari</h2>
       <table class="hours" id="hours"></table>
+      <p class="closures-note" id="closures-note"></p>
       <div class="info-actions">
         <button class="btn btn-ghost" data-fake="whatsapp">Scrivici su WhatsApp</button>
         <button class="btn btn-ghost" data-fake="call">Chiama</button>
@@ -59,7 +60,8 @@
       <p id="pitch-text">Lo preparo io con i tuoi trattamenti, i tuoi prezzi e i tuoi orari. Le clienti prenotano da sole dal telefono e tu ti ritrovi tutto in agenda. Sono di Chiuppano: se serve qualcosa passo di persona.</p>
       <ul class="pitch-list">
         <li>Prenotazioni online 24 ore su 24, senza telefonate</li>
-        <li>Promemoria su WhatsApp alla cliente il giorno prima</li>
+        <li>Orari, chiusure, prezzi e conferme li decidi tu</li>
+        <li>Promemoria WhatsApp alla cliente con un tocco</li>
         <li>Agenda sul telefono, con l'elenco delle clienti</li>
         <li>Sito con il tuo nome, non una pagina su un portale insieme ai concorrenti</li>
       </ul>
@@ -95,6 +97,51 @@
       <button class="icon-btn" id="day-next" aria-label="Giorno successivo">›</button>
     </div>
     <ol class="agenda-list" id="agenda-list"></ol>
+  </section>
+
+  <section class="settings">
+    <h2 class="settings-title">Lo decidi tu</h2>
+    <p class="settings-lead">Questa è una demo. Nel sito vero ogni cosa si imposta come vuoi tu, dal telefono, e puoi cambiarla quando vuoi. Qui sotto puoi provarne qualcuna.</p>
+
+    <div class="set">
+      <h3>Orari di apertura</h3>
+      <ul class="set-list" id="set-hours"></ul>
+      <p class="set-note">Pausa pranzo, orario continuato, sabato corto, orari diversi per stagione: li decidi tu.</p>
+    </div>
+
+    <div class="set">
+      <h3>Chiusure e ferie</h3>
+      <ul class="set-list" id="set-closures"></ul>
+      <div class="set-row">
+        <input type="date" id="close-date" aria-label="Giorno da chiudere">
+        <button class="mini mini-main" id="close-add">Chiudi questo giorno</button>
+      </div>
+      <p class="set-note">Prova: chiudi un giorno e torna al sito. Quel giorno non si può più prenotare.</p>
+    </div>
+
+    <div class="set">
+      <h3>Conferma delle prenotazioni</h3>
+      <p>Ogni prenotazione online arriva come richiesta. La confermi o la rifiuti tu, con un tocco, e alla cliente arriva il messaggio su WhatsApp.</p>
+    </div>
+
+    <div class="set">
+      <h3>Preavviso minimo</h3>
+      <label class="set-row"><span>Si può prenotare con almeno</span>
+        <select id="set-lead">
+          <option value="1">1 ora</option><option value="2">2 ore</option><option value="4">4 ore</option><option value="24">1 giorno</option>
+        </select> di anticipo</label>
+    </div>
+
+    <div class="set">
+      <h3>Annullamenti</h3>
+      <label class="set-row"><input type="checkbox" id="set-cancel"> <span>Le clienti possono annullare da sole fino a</span>
+        <select id="set-cancel-h"><option value="12">12</option><option value="24">24</option><option value="48">48</option></select> ore prima</label>
+    </div>
+
+    <div class="set">
+      <h3>Trattamenti, prezzi e testi</h3>
+      <p>Trattamenti, durate, prezzi, foto, tempo di riordino tra un appuntamento e l'altro, regolamento, nota sulla caparra: tutto si cambia dal pannello, senza chiamare nessuno.</p>
+    </div>
   </section>
 
   <p class="fineprint admin-foot">Dati di esempio. Nella versione reale l'agenda si sincronizza anche con il calendario di iPhone e Android.

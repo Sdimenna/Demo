@@ -62,7 +62,7 @@
   const durLabel = m => m < 60 ? `${m} min` : (m % 60 ? `${Math.floor(m/60)} h ${m%60} min` : `${m/60} h`);
   const longDate = d => `${DAY_NAMES[d.getDay()].toLowerCase()} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
   const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
-  const isOpen = d => HOURS[d.getDay()].length > 0;
+  const isOpen = d => HOURS[d.getDay()].length > 0 && !sets().closures.includes(ymd(d));
   const nowMin = () => { const d = new Date(); return d.getHours()*60 + d.getMinutes(); };
 
   // Numeri pseudo-casuali ripetibili (stessa agenda a ogni apertura)
@@ -75,8 +75,13 @@
   const store = {
     get(k, def) { try { const v = localStorage.getItem(`demo:${key}:${k}`); return v ? JSON.parse(v) : def; } catch { return def; } },
     set(k, v) { try { localStorage.setItem(`demo:${key}:${k}`, JSON.stringify(v)); } catch {} },
-    clear() { try { ["bookings","status","last"].forEach(k => localStorage.removeItem(`demo:${key}:${k}`)); } catch {} }
+    clear() { try { ["bookings","status","last","settings"].forEach(k => localStorage.removeItem(`demo:${key}:${k}`)); } catch {} }
   };
+
+  // Impostazioni che la titolare può cambiare dal pannello (come nel prodotto vero)
+  const DEFAULT_SET = { closures: [], leadH: 2, allowCancel: true, cancelH: 24 };
+  const sets = () => ({ ...DEFAULT_SET, ...store.get("settings", {}) });
+  const saveSets = patch => store.set("settings", { ...sets(), ...patch });
 
   /* ================= Agenda ================= */
   const seedCache = {};
@@ -121,12 +126,12 @@
   function freeSlots(dateStr, dur) {
     const d = parseYmd(dateStr);
     if (d < today() || !isOpen(d)) return [];
-    const busy = bookingsOn(dateStr);
-    const minStart = ymd(d) === ymd(today()) ? nowMin() + 60 : 0;
+    const busy = bookingsOn(dateStr).filter(b => b.status !== "rifiutata");
+    const earliest = Date.now() + sets().leadH * 3600e3;
     const out = [];
     for (const [a, b] of HOURS[d.getDay()]) {
       for (let t = toMin(a); t + dur <= toMin(b); t += 30) {
-        if (t < minStart) continue;
+        if (new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, t).getTime() < earliest) continue;
         if (!busy.some(x => t < x.end && t + dur > x.start)) out.push(t);
       }
     }
@@ -183,6 +188,10 @@
       const txt = r.length ? r.map(([a,b]) => `${a}–${b}`).join("<br>") : `<span class="closed">Chiuso</span>`;
       return `<tr class="${i === todayIdx ? "today" : ""}"><td>${DAY_NAMES[i]}</td><td>${txt}</td></tr>`;
     }).join("");
+
+    const upcoming = sets().closures.filter(c => parseYmd(c) >= today()).sort();
+    $("#closures-note").textContent = upcoming.length
+      ? `Chiusure straordinarie: ${upcoming.map(c => longDate(parseYmd(c))).join(", ")}.` : "";
   }
 
   /* ================= Prenotazione ================= */
@@ -255,7 +264,7 @@
 
     if (bk.step === 4) {
       const b = bk.saved, svc = ALL[b.svc];
-      $("#sheet-title").textContent = "Prenotazione confermata";
+      $("#sheet-title").textContent = "Richiesta inviata";
       body.innerHTML = `
         <div class="done-mark" aria-hidden="true">✓</div>
         <div class="summary">
@@ -264,12 +273,13 @@
           ${esc(salon.name)}${salon.city ? `, ${esc(salon.city)}` : ""}<br>
           Codice <span class="code">${b.code}</span>
         </div>
+        <p class="fineprint" style="margin-top:10px">L'orario è già tenuto per te. Il salone ti conferma a breve su WhatsApp.</p>
         <div class="stack">
           <button class="btn btn-ghost" id="ics">Aggiungi al calendario</button>
           <button class="btn btn-ghost" data-close>Chiudi</button>
         </div>
         <div class="callout">
-          <p><strong>E adesso guardala dalla parte del salone.</strong> La prenotazione è già comparsa in agenda, senza una telefonata.</p>
+          <p><strong>Adesso guardala dalla parte del salone.</strong> La richiesta è già arrivata in agenda, senza una telefonata, e decidi tu se confermarla.</p>
           <a class="btn btn-primary btn-wide" href="#pannello" id="to-admin">Apri il pannello del salone</a>
         </div>`;
     }
@@ -303,7 +313,7 @@
     if (!freeSlots(bk.date, svc.dur).includes(bk.time)) { bk.step = 2; bk.time = null; renderStep(); return toast("Quell'orario è appena stato preso: scegline un altro."); }
     const code = Array.from({ length: 6 }, () => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[Math.floor(Math.random()*32)]).join("");
     const saved = { id: `u-${Date.now()}`, date: bk.date, start: bk.time, end: bk.time + svc.dur, svc: svc.id,
-      who: name, phone, notes, source: "online", createdH: new Date().getHours(), status: "confermata", code, isNew: true };
+      who: name, phone, notes, source: "online", createdH: new Date().getHours(), status: "da confermare", code, isNew: true };
     store.set("bookings", [...userBookings(), saved]);
     store.set("last", saved.id);
     bk.saved = saved; bk.step = 4;
@@ -337,14 +347,17 @@
 
     const banner = $("#admin-new");
     if (last) {
+      const st = store.get("status", {})[last.id] || last.status;
+      const head = st === "da confermare" ? "Nuova richiesta online: decidi tu se confermarla"
+        : st === "rifiutata" ? "Richiesta rifiutata: l'orario è di nuovo libero" : "Prenotazione online confermata";
       banner.hidden = false;
-      banner.innerHTML = `<strong>Nuova prenotazione online</strong>${esc(last.who)}, ${esc(ALL[last.svc].name).toLowerCase()}, ${longDate(parseYmd(last.date))} alle ${toHm(last.start)}`;
+      banner.innerHTML = `<strong>${head}</strong>${esc(last.who)}, ${esc(ALL[last.svc].name).toLowerCase()}, ${longDate(parseYmd(last.date))} alle ${toHm(last.start)}`;
     } else banner.hidden = true;
 
     // Statistiche della settimana corrente (lun-dom)
     const t0 = today(), monday = addDays(t0, -((t0.getDay() + 6) % 7));
     let week = [];
-    for (let i = 0; i < 7; i++) week = week.concat(bookingsOn(ymd(addDays(monday, i))));
+    for (let i = 0; i < 7; i++) week = week.concat(bookingsOn(ymd(addDays(monday, i))).filter(b => b.status !== "rifiutata"));
     const online = week.filter(b => b.source === "online");
     const offHours = online.filter(b => b.createdH < 9 || b.createdH >= 19).length;
     $("#admin-stats").innerHTML = `
@@ -360,7 +373,7 @@
       : list.length ? list.map(b => {
           const svc = ALL[b.svc];
           const isNew = b.id === lastId;
-          return `<li class="appt ${isNew ? "is-new" : ""}">
+          return `<li class="appt ${isNew ? "is-new" : ""} ${b.status === "rifiutata" ? "is-off" : ""}">
             <div class="appt-time">${toHm(b.start)}<small>${toHm(b.end)}</small></div>
             <div>
               <p class="appt-who">${esc(b.who)}</p>
@@ -368,10 +381,15 @@
               ${b.notes ? `<p class="appt-what">“${esc(b.notes)}”</p>` : ""}
               <div class="appt-tags">
                 ${b.source === "online" ? `<span class="tag online">Online${b.createdH < 9 || b.createdH >= 19 ? `, alle ${b.createdH}:${pad((b.start * 7) % 60)}` : ""}</span>` : `<span class="tag">${esc(b.source)}</span>`}
-                ${b.status === "da confermare" ? `<span class="tag pending">Da confermare</span>` : b.status === "fatta" ? `<span class="tag">Fatto</span>` : ""}
+                ${b.status === "da confermare" ? `<span class="tag pending">Da confermare</span>`
+                  : b.status === "rifiutata" ? `<span class="tag">Rifiutata</span>`
+                  : b.status === "fatta" ? `<span class="tag">Fatto</span>` : ""}
               </div>
-              ${b.status !== "fatta" && parseYmd(b.date) >= t0 ? `<div class="appt-actions">
-                ${b.status === "da confermare" ? `<button class="mini" data-confirm="${b.id}">Conferma</button>` : ""}
+              ${b.status === "da confermare" && parseYmd(b.date) >= t0 ? `<div class="appt-actions">
+                <button class="mini mini-main" data-confirm="${b.id}" data-who="${esc(b.who)}">Conferma e scrivi su WhatsApp</button>
+                <button class="mini" data-refuse="${b.id}">Rifiuta</button>
+              </div>`
+              : b.status === "confermata" && parseYmd(b.date) >= t0 ? `<div class="appt-actions">
                 <button class="mini" data-remind="${esc(b.who)}">Promemoria WhatsApp</button>
               </div>` : ""}
             </div></li>`;
@@ -381,12 +399,55 @@
 
   $("#day-prev").onclick = () => { adminDay = ymd(addDays(parseYmd(adminDay), -1)); renderAdmin(); };
   $("#day-next").onclick = () => { adminDay = ymd(addDays(parseYmd(adminDay), 1)); renderAdmin(); };
+  const setStatus = (id, s) => { const st = store.get("status", {}); st[id] = s; store.set("status", st); };
   $("#agenda-list").addEventListener("click", e => {
-    const c = e.target.closest("[data-confirm]"), r = e.target.closest("[data-remind]");
-    if (c) { const st = store.get("status", {}); st[c.dataset.confirm] = "confermata"; store.set("status", st); renderAdmin(); toast("Confermato. La cliente riceve un messaggio di conferma."); }
-    if (r) toast(`Nella versione reale parte il messaggio WhatsApp per ${r.dataset.remind}, con giorno e orario.`);
+    const c = e.target.closest("[data-confirm]"), x = e.target.closest("[data-refuse]"), r = e.target.closest("[data-remind]");
+    if (c) { setStatus(c.dataset.confirm, "confermata"); renderAdmin(); toast(`Confermata. Nella versione reale si apre WhatsApp con la conferma per ${c.dataset.who} già scritta: premi solo invio.`); }
+    if (x) { setStatus(x.dataset.refuse, "rifiutata"); renderAdmin(); renderSite(); toast("Rifiutata. L'orario torna libero sul sito."); }
+    if (r) toast(`Nella versione reale si apre WhatsApp con il promemoria per ${r.dataset.remind} già scritto: premi solo invio.`);
   });
   $("#reset-demo").onclick = () => { store.clear(); adminDay = null; location.hash = ""; renderSite(); toast("Demo azzerata."); };
+
+  /* ================= Lo decidi tu (impostazioni) ================= */
+  function renderSettings() {
+    const s = sets();
+    $("#set-hours").innerHTML = [2,3,4,5,6,0,1].map(i => {
+      const r = HOURS[i];
+      return `<li><span>${DAY_NAMES[i]}</span><span>${r.length ? r.map(([a,b]) => `${a}–${b}`).join(", ") : "Chiuso"}</span></li>`;
+    }).join("");
+    const upcoming = s.closures.filter(c => parseYmd(c) >= today()).sort();
+    $("#set-closures").innerHTML = upcoming.length
+      ? upcoming.map(c => `<li><span>${longDate(parseYmd(c))}</span><button class="linklike" data-unclose="${c}">Riapri</button></li>`).join("")
+      : `<li class="fineprint">Nessuna chiusura straordinaria in programma.</li>`;
+    const inp = $("#close-date");
+    inp.min = ymd(today()); inp.max = ymd(addDays(today(), 90));
+    $("#set-lead").value = String(s.leadH);
+    $("#set-cancel").checked = s.allowCancel;
+    $("#set-cancel-h").value = String(s.cancelH);
+    $("#set-cancel-h").disabled = !s.allowCancel;
+  }
+  $("#close-add").onclick = () => {
+    const v = $("#close-date").value;
+    if (!v) return toast("Scegli prima il giorno da chiudere.");
+    const s = sets();
+    if (!s.closures.includes(v)) saveSets({ closures: [...s.closures, v] });
+    $("#close-date").value = "";
+    renderSettings(); renderSite();
+    toast(`Chiuso ${longDate(parseYmd(v))}: sul sito quel giorno non si può più prenotare.`);
+  };
+  $("#set-closures").addEventListener("click", e => {
+    const b = e.target.closest("[data-unclose]");
+    if (!b) return;
+    saveSets({ closures: sets().closures.filter(c => c !== b.dataset.unclose) });
+    renderSettings(); renderSite();
+    toast("Giorno riaperto alle prenotazioni.");
+  });
+  $("#set-lead").onchange = e => {
+    saveSets({ leadH: +e.target.value }); renderSite();
+    toast(+e.target.value >= 24 ? "Ora si prenota solo dal giorno dopo in poi." : `Ora si prenota con almeno ${e.target.value} ${+e.target.value === 1 ? "ora" : "ore"} di preavviso.`);
+  };
+  $("#set-cancel").onchange = e => { saveSets({ allowCancel: e.target.checked }); renderSettings(); toast(e.target.checked ? "Le clienti possono annullare da sole." : "Per annullare, le clienti devono scriverti."); };
+  $("#set-cancel-h").onchange = e => { saveSets({ cancelH: +e.target.value }); toast(`Annullamento possibile fino a ${e.target.value} ore prima.`); };
 
   /* ================= Navigazione ================= */
   function route() {
@@ -394,7 +455,7 @@
     $("#site").hidden = admin;
     $("#admin").hidden = !admin;
     $("#ribbon-link").hidden = admin;
-    if (admin) renderAdmin();
+    if (admin) { renderAdmin(); renderSettings(); }
     window.scrollTo(0, 0);
   }
   window.addEventListener("hashchange", route);

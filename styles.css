@@ -297,6 +297,32 @@ main, .foot, #admin > * { max-width: var(--max); margin-inline: auto; }
 .mini { min-height: 34px; padding: 0 12px; font-size: 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 600; }
 .mini:hover { border-color: var(--accent); }
 .admin-foot { padding: 10px var(--gutter); }
+.mini-main { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.mini-main:hover { background: color-mix(in srgb, var(--accent) 88%, black); }
+.appt.is-off { opacity: .5; }
+.closures-note { margin: -8px 0 16px; font-size: 15px; color: var(--accent); font-weight: 600; }
+.closures-note:empty { display: none; }
+
+/* ---------- Lo decidi tu ---------- */
+.settings { padding: 28px var(--gutter) 8px; margin-top: 18px; border-top: 1px solid var(--line); }
+.settings-title {
+  font-family: var(--display); font-weight: var(--display-weight); letter-spacing: var(--display-track);
+  font-size: 30px; line-height: 1.1; margin-bottom: 8px;
+}
+.settings-lead { color: var(--muted); margin-bottom: 18px; max-width: 46ch; }
+.set { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.set h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.set p { font-size: 15px; }
+.set-note { color: var(--muted); font-size: 14px !important; margin-top: 8px; }
+.set-list { list-style: none; margin: 0; padding: 0; font-size: 15px; }
+.set-list li { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-variant-numeric: tabular-nums; }
+.set-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 15px; margin-top: 6px; }
+.set-row input[type="date"], .set-row select {
+  min-height: 38px; padding: 0 10px; border-radius: 10px; border: 1.5px solid var(--line);
+  background: var(--surface); color: var(--ink); font: inherit; font-size: 15px;
+}
+.set-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent); }
+.set-row select:disabled { opacity: .5; }
 
 /* ---------- Toast ---------- */
 .toast {
