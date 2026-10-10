@@ -7,7 +7,6 @@ window.SALONS = {
   // Centri estetici
   barbara:  { name: "Salone Barbara",       kind: "estetica",     city: "Caldogno",     owner: "Barbara" },
   arte:     { name: "Estetica Artè",        kind: "estetica",     city: "Caldogno" },
-  gemma:    { name: "Estetica La Gemma",    kind: "estetica",     city: "Dueville",     owner: "Moira" },
   cynthia:  { name: "Cynthia Estetica",     kind: "estetica",     city: "Casalserugo",  owner: "Cynthia" },
   susycinzia: { name: "Susy e Cinzia",      kind: "estetica",     city: "Padova" },
 
@@ -29,7 +28,7 @@ window.SALONS = {
   starbien:      { name: "Star Bien",                     kind: "estetica", city: "Bovolenta" },
   bottegaunghia: { name: "La Bottega dell'Unghia",        kind: "estetica", menu: "unghie", city: "Costabissara" },
   emysem:        { name: "Emysem Nails",                  kind: "estetica", menu: "unghie", city: "Vigonza" },
-  esteticabarbara: { name: "Estetica Barbara",            kind: "estetica", city: "" },
+  esteticabarbara: { name: "Estetica Barbara",            kind: "estetica", city: "Vicenza" },
   essenza:       { name: "L'Essenza Estetica e Benessere", kind: "estetica", city: "" },
   lnnail:        { name: "L.N Nail",                      kind: "estetica", menu: "unghie", city: "" },
   solarium:      { name: "Centro Estetico Solarium",      kind: "estetica", city: "Pontelongo" },
