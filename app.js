@@ -4,12 +4,15 @@
   /* ================= Configurazione ================= */
   const params = new URLSearchParams(location.search);
   const slug = (params.get("s") || "").toLowerCase();
-  const fallbackKind = params.get("tipo") === "parrucchiere" ? "parrucchiere" : "estetica";
+  const TIPI = ["estetica", "parrucchiere", "barbiere", "unghie", "toelettatura", "fisioterapia", "tatuaggi", "gommista"];
+  const fallbackKind = TIPI.includes(params.get("tipo")) ? params.get("tipo") : "estetica";
   const salon = window.SALONS[slug] || window.SALONS[fallbackKind];
   const key = window.SALONS[slug] ? slug : fallbackKind;
   const KIND = salon.kind;
+  const MENU = salon.menu || KIND;
   const SIRO_WA = "393452106846";
 
+  // [nome, durata in minuti, prezzo, caparra facoltativa]
   const SERVICES = {
     estetica: [
       { cat: "Viso", items: [
@@ -43,25 +46,85 @@
         ["Refill", 90, 40], ["Nail art", 30, 10] ] },
       { cat: "Piedi", items: [
         ["Pedicure estetico", 50, 32], ["Semipermanente piedi", 60, 35] ] }
+    ],
+    toelettatura: [
+      { cat: "Bagno e asciugatura", items: [
+        ["Bagno taglia piccola", 45, 30], ["Bagno taglia media", 60, 40], ["Bagno taglia grande", 90, 55] ] },
+      { cat: "Toelettatura completa", items: [
+        ["Completa taglia piccola", 90, 45], ["Completa taglia media", 120, 60], ["Completa taglia grande", 150, 80],
+        ["Stripping", 120, 65] ] },
+      { cat: "Servizi veloci", items: [
+        ["Taglio unghie", 15, 8], ["Pulizia orecchie", 15, 8], ["Trattamento antiparassitario", 30, 15] ] }
+    ],
+    fisioterapia: [
+      { cat: "Visite", items: [
+        ["Prima visita e valutazione", 60, 60], ["Visita di controllo", 30, 40] ] },
+      { cat: "Terapie", items: [
+        ["Seduta di fisioterapia", 45, 50], ["Riabilitazione post-operatoria", 60, 55], ["Tecarterapia", 30, 40],
+        ["Onde d'urto", 20, 45], ["Massoterapia", 45, 45] ] },
+      { cat: "Osteopatia", items: [
+        ["Trattamento osteopatico", 50, 65] ] }
+    ],
+    tatuaggi: [
+      { cat: "Consulenza", items: [
+        ["Consulenza e progetto", 30, 0] ] },
+      { cat: "Tatuaggi", items: [
+        ["Tatuaggio piccolo (fino a 5 cm)", 60, 80, 30], ["Tatuaggio medio", 120, 150, 50],
+        ["Sessione di mezza giornata", 240, 300, 80], ["Ritocco", 30, 0] ] },
+      { cat: "Piercing", items: [
+        ["Piercing lobo", 15, 30], ["Piercing cartilagine", 20, 40] ] }
+    ],
+    gommista: [
+      { cat: "Cambio gomme", items: [
+        ["Cambio gomme stagionale", 30, 40], ["Cambio gomme con deposito", 30, 60], ["Montaggio gomme nuove", 45, 45] ] },
+      { cat: "Assetto", items: [
+        ["Equilibratura", 20, 20], ["Convergenza", 40, 45] ] },
+      { cat: "Riparazioni", items: [
+        ["Riparazione foratura", 20, 20], ["Controllo pneumatici", 10, 0] ] }
     ]
-  }[salon.menu || KIND];
-  const MENU = salon.menu || KIND;
-  const ALL = SERVICES.flatMap(g => g.items.map(([name, dur, price]) => ({ cat: g.cat, name, dur, price })));
+  }[MENU];
+  const ALL = SERVICES.flatMap(g => g.items.map(([name, dur, price, dep]) => ({ cat: g.cat, name, dur, price, dep: dep || 0 })));
   ALL.forEach((s, i) => s.id = i);
 
   // 0 = domenica
-  const HOURS = {
+  const HOURS_ALL = {
     estetica: { 0: [], 1: [], 2: [["09:00","12:30"],["14:30","19:00"]], 3: [["09:00","12:30"],["14:30","19:00"]],
                 4: [["09:00","12:30"],["14:30","20:00"]], 5: [["09:00","12:30"],["14:30","19:00"]], 6: [["09:00","13:00"]] },
     parrucchiere: { 0: [], 1: [], 2: [["08:30","12:30"],["14:30","19:00"]], 3: [["08:30","12:30"],["14:30","19:00"]],
-                4: [["09:00","19:00"]], 5: [["08:30","12:30"],["14:30","19:00"]], 6: [["08:00","17:00"]] }
-  }[KIND];
+                4: [["09:00","19:00"]], 5: [["08:30","12:30"],["14:30","19:00"]], 6: [["08:00","17:00"]] },
+    toelettatura: { 0: [], 1: [], 2: [["08:30","12:30"],["14:30","18:30"]], 3: [["08:30","12:30"],["14:30","18:30"]],
+                4: [["08:30","12:30"],["14:30","18:30"]], 5: [["08:30","12:30"],["14:30","18:30"]], 6: [["08:30","12:30"]] },
+    fisioterapia: { 0: [], 1: [["08:00","13:00"],["14:00","20:00"]], 2: [["08:00","13:00"],["14:00","20:00"]], 3: [["08:00","13:00"],["14:00","20:00"]],
+                4: [["08:00","13:00"],["14:00","20:00"]], 5: [["08:00","13:00"],["14:00","19:00"]], 6: [] },
+    tatuaggi: { 0: [], 1: [], 2: [["10:00","13:00"],["14:30","19:30"]], 3: [["10:00","13:00"],["14:30","19:30"]],
+                4: [["10:00","13:00"],["14:30","19:30"]], 5: [["10:00","13:00"],["14:30","19:30"]], 6: [["10:00","18:00"]] },
+    gommista: { 0: [], 1: [["08:00","12:00"],["14:00","18:30"]], 2: [["08:00","12:00"],["14:00","18:30"]], 3: [["08:00","12:00"],["14:00","18:30"]],
+                4: [["08:00","12:00"],["14:00","18:30"]], 5: [["08:00","12:00"],["14:00","18:30"]], 6: [["08:00","12:00"]] }
+  };
+  const HOURS = HOURS_ALL[MENU] || HOURS_ALL[KIND];
+
+  // Le parole di ogni settore
+  const SECT_ALL = {
+    estetica:     { label: "Centro estetico", lead: "Prenota il tuo trattamento quando vuoi, anche mentre siamo in cabina.", place: "centro", the: "Il centro", del: "del centro", clients: "Le clienti", client: "alla cliente", menuTitle: "Trattamenti e prezzi", what: "trattamento", q1: "Cosa vuoi prenotare?", notes: "Note per il centro (facoltative)", ph: "" },
+    parrucchiere: { label: "Parrucchiere", lead: "Prenota taglio, colore e piega quando vuoi, senza telefonare.", place: "salone", the: "Il salone", del: "del salone", clients: "Le clienti", client: "alla cliente", menuTitle: "Servizi e prezzi", what: "servizio", q1: "Cosa vuoi prenotare?", notes: "Note per il salone (facoltative)", ph: "" },
+    barbiere:     { label: "Barbiere", lead: "Prenota taglio e barba quando vuoi, senza telefonare e senza attese.", place: "salone", the: "Il salone", del: "del salone", clients: "I clienti", client: "al cliente", menuTitle: "Servizi e prezzi", what: "servizio", q1: "Cosa vuoi prenotare?", notes: "Note per il barbiere (facoltative)", ph: "" },
+    unghie:       { label: "Centro unghie", lead: "Prenota manicure, gel e semipermanente quando vuoi, anche mentre siamo al lavoro.", place: "centro", the: "Il centro", del: "del centro", clients: "Le clienti", client: "alla cliente", menuTitle: "Servizi e prezzi", what: "servizio", q1: "Cosa vuoi prenotare?", notes: "Note per il centro (facoltative)", ph: "Es. colore, forma, nail art" },
+    toelettatura: { label: "Toelettatura", lead: "Prenota il bagno o la toelettatura del tuo cane quando vuoi, anche mentre abbiamo le mani nel sapone.", place: "negozio", the: "Il negozio", del: "del negozio", clients: "I clienti", client: "al cliente", menuTitle: "Servizi e prezzi", what: "servizio", q1: "Cosa prenotiamo per il tuo cane?", notes: "Nome, razza e taglia del cane", ph: "Es. Luna, barboncino, taglia piccola" },
+    fisioterapia: { label: "Studio di fisioterapia", lead: "Prenota la tua seduta quando vuoi, senza chiamare mentre siamo con un paziente.", place: "studio", the: "Lo studio", del: "dello studio", clients: "I pazienti", client: "al paziente", menuTitle: "Trattamenti e tariffe", what: "trattamento", q1: "Cosa vuoi prenotare?", notes: "Motivo della visita (facoltativo)", ph: "Es. dolore lombare da due settimane" },
+    tatuaggi:     { label: "Studio di tatuaggi", lead: "Prenota la consulenza o la tua sessione, con l'idea già descritta.", place: "studio", the: "Lo studio", del: "dello studio", clients: "I clienti", client: "al cliente", menuTitle: "Lavori e prezzi", what: "appuntamento", q1: "Cosa vuoi prenotare?", notes: "Descrivi la tua idea", ph: "Soggetto, zona del corpo, misura indicativa", from: true },
+    gommista:     { label: "Gommista", lead: "Prenota il cambio gomme in pochi secondi, senza fare la coda al telefono.", place: "officina", the: "L'officina", del: "dell'officina", clients: "I clienti", client: "al cliente", menuTitle: "Servizi e prezzi", what: "servizio", q1: "Cosa ti serve?", notes: "Targa e modello dell'auto", ph: "Es. AB123CD, Fiat Panda" }
+  };
+  const SECT = SECT_ALL[MENU] || SECT_ALL[KIND];
+
   const DAY_NAMES = ["Domenica","Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato"];
   const DAY_SHORT = ["dom","lun","mar","mer","gio","ven","sab"];
   const MONTHS = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
   const CLIENTS = ["Martina R.","Giulia B.","Chiara F.","Elena C.","Sara E.","Valentina G.","Francesca M.","Alessia B.",
                    "Anna P.","Laura D.","Federica S.","Silvia T.","Marta Z.","Ilaria V.","Paola N.","Roberta L."];
   const CLIENTS_M = ["Marco R.","Luca B.","Davide F.","Andrea C.","Matteo G."];
+  const CLIENTS_MIX = ["Marco R.","Giulia B.","Luca F.","Elena C.","Davide S.","Sara M.","Andrea C.","Chiara T.","Matteo G.","Paola N.","Stefano L.","Laura D."];
+  const DOGS = ["Luna","Milo","Kira","Rocky","Nina","Leo","Maya","Otto","Bella","Zoe","Argo","Lilla"];
+  const CARS = ["Fiat Panda","VW Golf","Toyota Yaris","Jeep Renegade","Fiat 500","Renault Clio","Audi A3","Dacia Duster","Ford Fiesta","Peugeot 208"];
 
   /* ================= Utilità ================= */
   const $ = s => document.querySelector(s);
@@ -72,7 +135,8 @@
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
   const toMin = t => { const [h,m] = t.split(":").map(Number); return h*60 + m; };
   const toHm = m => `${pad(Math.floor(m/60))}:${pad(m%60)}`;
-  const euro = n => `${n} €`;
+  const euro = n => n === 0 ? "Gratis" : `${SECT.from ? "da " : ""}${n} €`;
+  const depLabel = s => s.dep ? ` · caparra ${s.dep} €` : "";
   const durLabel = m => m < 60 ? `${m} min` : (m % 60 ? `${Math.floor(m/60)} h ${m%60} min` : `${m/60} h`);
   const longDate = d => `${DAY_NAMES[d.getDay()].toLowerCase()} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
   const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
@@ -113,12 +177,15 @@
           const svc = ALL[Math.floor(r() * ALL.length)];
           if (t + svc.dur <= end) {
             const male = MENU === "barbiere" || (KIND === "parrucchiere" && svc.cat === "Uomo");
-            const pool = male ? CLIENTS_M : CLIENTS;
+            const pool = male ? CLIENTS_M : ["toelettatura","fisioterapia","tatuaggi","gommista"].includes(MENU) ? CLIENTS_MIX : CLIENTS;
+            const person = pool[Math.floor(r() * pool.length)];
+            const who = MENU === "toelettatura" ? `${DOGS[Math.floor(r() * DOGS.length)]} (${person})`
+              : MENU === "gommista" ? `${person}, ${CARS[Math.floor(r() * CARS.length)]}` : person;
             const online = r() < 0.62;
             const createdH = online ? [7, 8, 12, 13, 20, 21, 22, 23, 10, 15][Math.floor(r()*10)] : 10 + Math.floor(r()*8);
             out.push({
               id: `s-${dateStr}-${t}`, date: dateStr, start: t, end: t + svc.dur, svc: svc.id,
-              who: pool[Math.floor(r() * pool.length)], source: online ? "online" : (r() < .5 ? "telefono" : "in salone"),
+              who, source: online ? "online" : (r() < .5 ? "telefono" : `in ${SECT.place}`),
               createdH, status: d < t0 ? "fatta" : (r() < 0.15 ? "da confermare" : "confermata")
             });
             t += svc.dur + (r() < .3 ? 30 : 0);
@@ -154,18 +221,19 @@
 
   /* ================= Sito ================= */
   function renderSite() {
-    const kindLabel = { estetica: "Centro estetico", parrucchiere: "Parrucchiere", barbiere: "Barbiere", unghie: "Centro unghie" }[MENU];
     document.documentElement.dataset.kind = KIND;
     document.title = `${salon.name} · Prenota online`;
     $("#brand-small").textContent = salon.name;
     $("#hero-name").textContent = salon.name;
-    $("#hero-kicker").textContent = salon.city ? `${kindLabel} a ${salon.city}` : kindLabel;
-    $("#hero-lead").textContent = {
-      estetica: "Prenota il tuo trattamento quando vuoi, anche mentre siamo in cabina.",
-      parrucchiere: "Prenota taglio, colore e piega quando vuoi, senza telefonare.",
-      barbiere: "Prenota taglio e barba quando vuoi, senza telefonare e senza attese.",
-      unghie: "Prenota manicure, gel e semipermanente quando vuoi, anche mentre siamo al lavoro."
-    }[MENU];
+    $("#hero-kicker").textContent = salon.city ? `${SECT.label} a ${salon.city}` : SECT.label;
+    $("#hero-lead").textContent = SECT.lead;
+    $("#menu-title").textContent = SECT.menuTitle;
+    $("#hint").textContent = `Scegli ${SECT.what}, giorno e orario. Ci vogliono 30 secondi, anche alle 11 di sera.`;
+    $("#pitch-text").textContent = `Lo preparo io con i tuoi servizi, i tuoi prezzi e i tuoi orari. ${SECT.clients} prenotano da soli dal telefono e tu ti ritrovi tutto in agenda. Sono di Chiuppano: se serve qualcosa passo di persona.`;
+    $("#pitch-remind").textContent = `Promemoria WhatsApp ${SECT.client} con un tocco`;
+    $("#ribbon-link").textContent = `Vedi il pannello ${SECT.del}`;
+    $("#admin-label").textContent = `Pannello ${SECT.del}`;
+    $("#set-services").textContent = SECT.what === "trattamento" ? "Trattamenti, prezzi e testi" : "Servizi, prezzi e testi";
     $("#foot-name").textContent = salon.name;
     $("#admin-name").textContent = salon.name;
 
@@ -195,7 +263,7 @@
         ${ALL.filter(s => s.cat === g.cat).map(s => `
           <button class="menu-row" data-svc="${s.id}">
             <span class="menu-name">${esc(s.name)}</span><span class="menu-price">${euro(s.price)}</span>
-            <span class="menu-dur">${durLabel(s.dur)}</span>
+            <span class="menu-dur">${durLabel(s.dur)}${depLabel(s)}</span>
           </button>`).join("")}
       </div>`).join("");
 
@@ -229,10 +297,10 @@
     $("#sheet-steps").textContent = bk.step < 4 ? `Passo ${bk.step} di 3` : "";
 
     if (bk.step === 1) {
-      $("#sheet-title").textContent = "Cosa vuoi prenotare?";
+      $("#sheet-title").textContent = SECT.q1;
       body.innerHTML = SERVICES.map(g => `<p class="pick-group">${esc(g.cat)}</p>` +
         ALL.filter(s => s.cat === g.cat).map(s => `
-          <button class="pick-row" data-pick="${s.id}"><span>${esc(s.name)}</span><strong>${euro(s.price)}</strong><small>${durLabel(s.dur)}</small></button>`).join("")
+          <button class="pick-row" data-pick="${s.id}"><span>${esc(s.name)}</span><strong>${euro(s.price)}</strong><small>${durLabel(s.dur)}${depLabel(s)}</small></button>`).join("")
       ).join("");
     }
 
@@ -274,7 +342,7 @@
           <label class="field"><span>Nome e cognome</span><input name="name" autocomplete="name" value="${esc(bk.name || "")}" required></label>
           <label class="field"><span>Cellulare</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" value="${esc(bk.phone || "")}" required>
             <p class="fineprint" style="margin-top:4px">Ti arriva il promemoria su WhatsApp il giorno prima.</p></label>
-          <label class="field"><span>Note per il salone (facoltative)</span><textarea name="notes">${esc(bk.notes || "")}</textarea></label>
+          <label class="field"><span>${esc(SECT.notes)}</span><textarea name="notes" placeholder="${esc(SECT.ph)}">${esc(bk.notes || "")}</textarea></label>
           <div class="sticky-cta"><button class="btn btn-primary btn-wide" type="submit">Conferma la prenotazione</button></div>
         </form>`;
     }
@@ -290,14 +358,14 @@
           ${esc(salon.name)}${salon.city ? `, ${esc(salon.city)}` : ""}<br>
           Codice <span class="code">${b.code}</span>
         </div>
-        <p class="fineprint" style="margin-top:10px">L'orario è già tenuto per te. Il salone ti conferma a breve su WhatsApp.</p>
+        <p class="fineprint" style="margin-top:10px">L'orario è già tenuto per te. ${SECT.the} ti conferma a breve su WhatsApp.${svc.dep ? ` La caparra di ${svc.dep} € si versa ${SECT.place === "studio" ? "in studio" : "in sede"} prima della seduta.` : ""}</p>
         <div class="stack">
           <button class="btn btn-ghost" id="ics">Aggiungi al calendario</button>
           <button class="btn btn-ghost" data-close>Chiudi</button>
         </div>
         <div class="callout">
-          <p><strong>Adesso guardala dalla parte del salone.</strong> La richiesta è già arrivata in agenda, senza una telefonata, e decidi tu se confermarla.</p>
-          <a class="btn btn-primary btn-wide" href="#pannello" id="to-admin">Apri il pannello del salone</a>
+          <p><strong>Adesso guardala dalla parte ${SECT.del}.</strong> La richiesta è già arrivata in agenda, senza una telefonata, e decidi tu se confermarla.</p>
+          <a class="btn btn-primary btn-wide" href="#pannello" id="to-admin">Apri il pannello ${SECT.del}</a>
         </div>`;
     }
     $("#sheet-body").scrollTop = 0;
@@ -380,13 +448,13 @@
     $("#admin-stats").innerHTML = `
       <div class="stat"><strong>${week.length}</strong><span>appuntamenti questa settimana</span></div>
       <div class="stat"><strong>${week.length ? Math.round(online.length / week.length * 100) : 0}%</strong><span>prenotati online, senza telefonate</span></div>
-      <div class="stat"><strong>${offHours}</strong><span>arrivati a salone chiuso, di sera o all'alba</span></div>`;
+      <div class="stat"><strong>${offHours}</strong><span>arrivati a ${SECT.place} chiuso, di sera o all'alba</span></div>`;
 
     const d = parseYmd(adminDay);
     $("#agenda-day").textContent = ymd(d) === ymd(t0) ? `Oggi, ${d.getDate()} ${MONTHS[d.getMonth()]}` : longDate(d);
     const list = bookingsOn(adminDay);
     $("#agenda-list").innerHTML = !isOpen(d)
-      ? `<li class="empty">${DAY_NAMES[d.getDay()]}: salone chiuso.</li>`
+      ? `<li class="empty">${DAY_NAMES[d.getDay()]}: ${SECT.place} chiuso.</li>`
       : list.length ? list.map(b => {
           const svc = ALL[b.svc];
           const isNew = b.id === lastId;
@@ -482,7 +550,7 @@
     if (!t) return;
     if (t.dataset.svc != null) return openBooking({ svc: +t.dataset.svc });
     if (t.dataset.slot) { const [date, time] = t.dataset.slot.split("|"); return openBooking({ date, time: +time }); }
-    if (t.dataset.fake) return toast(t.dataset.fake === "whatsapp" ? "Nella versione reale si apre la chat WhatsApp del salone." : "Nella versione reale parte la chiamata al salone.");
+    if (t.dataset.fake) return toast(t.dataset.fake === "whatsapp" ? `Nella versione reale si apre la chat WhatsApp ${SECT.del}.` : `Nella versione reale parte la chiamata ${SECT.del.replace(/^d/, "a").replace("allo", "allo")}.`);
     openBooking();
   });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !sheet.hidden) closeBooking(); });

@@ -30,6 +30,76 @@
   --display-track: -0.035em;
   --radius-btn: 6px;
 }
+
+[data-kind="toelettatura"] {          /* sapone e salvia, pallina da tennis */
+  --bg: #F3F6F1;
+  --surface: #FFFFFF;
+  --soft: #E2ECDD;
+  --line: #CFDCCA;
+  --ink: #1D2A22;
+  --muted: #5D6D62;
+  --accent: #2D6A4C;
+  --accent-ink: #FFFFFF;
+  --deep: #1F4A36;
+  --brass: #E9A92A;
+  --display: "Rubik", "Arial Rounded MT Bold", sans-serif;
+  --display-weight: 800;
+  --display-track: -0.03em;
+  --radius-btn: 16px;
+}
+[data-kind="fisioterapia"] {          /* nastro kinesio blu e rosa */
+  --bg: #F4F6FA;
+  --surface: #FFFFFF;
+  --soft: #DFE7F5;
+  --line: #CCD7EA;
+  --ink: #0F1E36;
+  --muted: #56647C;
+  --accent: #1F57B8;
+  --accent-ink: #FFFFFF;
+  --deep: #13284F;
+  --brass: #D9476E;
+  --display: "Outfit", "Segoe UI", sans-serif;
+  --display-weight: 600;
+  --display-track: -0.035em;
+  --radius-btn: 10px;
+}
+[data-kind="tatuaggi"] {              /* inchiostro e foglia d'oro */
+  --bg: #17110F;
+  --surface: #211916;
+  --soft: #2E2420;
+  --line: #3E322C;
+  --ink: #EDE5D6;
+  --muted: #A4978A;
+  --accent: #C9A44B;
+  --accent-ink: #17110F;
+  --deep: #2A1F1B;
+  --brass: #C9A44B;
+  --ribbon: #C9A44B;
+  --ribbon-ink: #17110F;
+  --toast: #EDE5D6;
+  --toast-ink: #17110F;
+  --display: "Pirata One", "Old English Text MT", serif;
+  --display-weight: 400;
+  --display-track: 0.01em;
+  --radius-btn: 3px;
+  color-scheme: dark;
+}
+[data-kind="gommista"] {              /* officina: cemento, asfalto, giallo sicurezza */
+  --bg: #EEEEEA;
+  --surface: #FFFFFF;
+  --soft: #E1E1DA;
+  --line: #CBCBC2;
+  --ink: #1C1D1F;
+  --muted: #63656A;
+  --accent: #F2B300;
+  --accent-ink: #1C1D1F;
+  --deep: #1C1D1F;
+  --brass: #1C1D1F;
+  --display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --display-weight: 900;
+  --display-track: 0;
+  --radius-btn: 4px;
+}
 :root {
   --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --gutter: 20px;
@@ -339,3 +409,33 @@ main, .foot, #admin > * { max-width: var(--max); margin-inline: auto; }
   :root { --gutter: 28px; }
   .hero { padding-top: 64px; }
 }
+
+/* ---------- Ritocchi per i settori ---------- */
+.ribbon { background: var(--ribbon, var(--ink)); color: var(--ribbon-ink, #fff); }
+.ribbon-link { color: inherit; }
+.toast { background: var(--toast, var(--ink)); color: var(--toast-ink, #fff); }
+[data-kind="toelettatura"] .menu-cat h3, [data-kind="fisioterapia"] .menu-cat h3 { color: var(--brass); }
+[data-kind="toelettatura"] .slots-now { border-radius: 22px; border: 2px solid var(--brass); }
+[data-kind="toelettatura"] .hero-name { line-height: .92; }
+[data-kind="fisioterapia"] .slots-now { border-radius: 14px; border-top: 4px solid var(--brass); }
+[data-kind="fisioterapia"] .hero-name { font-size: clamp(42px, 12vw, 78px); }
+[data-kind="tatuaggi"] .hero-name { font-size: clamp(54px, 16vw, 104px); line-height: .9; }
+[data-kind="tatuaggi"] .section-title, [data-kind="tatuaggi"] .pitch h2 { font-size: 40px; }
+[data-kind="tatuaggi"] .slots-now { border-radius: 4px; border: 1px solid var(--accent); }
+[data-kind="tatuaggi"] .menu-cat h3 { color: var(--accent); }
+[data-kind="tatuaggi"] .pitch-list li::before { color: var(--accent); }
+[data-kind="tatuaggi"] .pitch { border-top: 1px solid var(--accent); border-bottom: 1px solid var(--accent); }
+[data-kind="tatuaggi"] .field .err { color: #FF9C8A; }
+[data-kind="tatuaggi"] .sheet-backdrop { background: rgba(0, 0, 0, .65); }
+[data-kind="gommista"] .hero-name, [data-kind="gommista"] .section-title,
+[data-kind="gommista"] .pitch h2, [data-kind="gommista"] .sheet-title,
+[data-kind="gommista"] .brand, [data-kind="gommista"] .admin-name { text-transform: uppercase; }
+[data-kind="gommista"] .hero-name { font-size: clamp(52px, 15vw, 98px); line-height: .88; }
+[data-kind="gommista"] .slots-now { border-radius: 4px; border: 0; border-left: 6px solid var(--accent); }
+[data-kind="gommista"] .menu-cat h3, [data-kind="gommista"] .closures-note { color: var(--ink); }
+[data-kind="gommista"] .menu-row:hover .menu-name { color: var(--ink); text-decoration: underline; }
+[data-kind="gommista"] :focus-visible { outline-color: var(--ink); }
+[data-kind="gommista"] .day .dot { background: var(--ink); }
+[data-kind="gommista"] .day.sel .dot { background: var(--accent-ink); }
+[data-kind="gommista"] .pitch-list li::before { color: var(--accent); }
+[data-kind="gommista"] .callout { border-color: var(--ink); }

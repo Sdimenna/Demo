@@ -8,8 +8,8 @@
 <meta name="description" content="Anteprima di un sito con prenotazione online per centri estetici e parrucchieri.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:wght@400;500;600;700&family=Rubik:wght@500;700;800&family=Outfit:wght@500;600;700&family=Pirata+One&family=Big+Shoulders+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
 
@@ -35,14 +35,14 @@
         <p class="slots-now-title">Primi orari liberi</p>
         <div class="slots-now-list" id="next-slots"></div>
         <button class="btn btn-primary btn-wide" data-open-booking>Prenota un appuntamento</button>
-        <p class="hint">Scegli trattamento, giorno e orario. Ci vogliono 30 secondi, anche alle 11 di sera.</p>
+        <p class="hint" id="hint">Scegli trattamento, giorno e orario. Ci vogliono 30 secondi, anche alle 11 di sera.</p>
       </div>
     </section>
 
     <section class="menu" id="trattamenti">
-      <h2 class="section-title">Trattamenti e prezzi</h2>
+      <h2 class="section-title" id="menu-title">Trattamenti e prezzi</h2>
       <div id="menu"></div>
-      <p class="fineprint">Listino di esempio: nella versione reale ci sono i trattamenti e i prezzi del salone.</p>
+      <p class="fineprint">Listino di esempio: nella versione reale ci sono i tuoi servizi e i tuoi prezzi.</p>
     </section>
 
     <section class="info">
@@ -61,7 +61,7 @@
       <ul class="pitch-list">
         <li>Prenotazioni online 24 ore su 24, senza telefonate</li>
         <li>Orari, chiusure, prezzi e conferme li decidi tu</li>
-        <li>Promemoria WhatsApp alla cliente con un tocco</li>
+        <li id="pitch-remind">Promemoria WhatsApp alla cliente con un tocco</li>
         <li>Agenda sul telefono, con l'elenco delle clienti</li>
         <li>Sito con il tuo nome, non una pagina su un portale insieme ai concorrenti</li>
       </ul>
@@ -80,7 +80,7 @@
 <div id="admin" hidden>
   <header class="admin-top">
     <div>
-      <p class="admin-label">Pannello del salone</p>
+      <p class="admin-label" id="admin-label">Pannello del salone</p>
       <p class="admin-name" id="admin-name"></p>
     </div>
     <a href="#" class="btn btn-ghost btn-sm">Torna al sito</a>
@@ -139,7 +139,7 @@
     </div>
 
     <div class="set">
-      <h3>Trattamenti, prezzi e testi</h3>
+      <h3 id="set-services">Trattamenti, prezzi e testi</h3>
       <p>Trattamenti, durate, prezzi, foto, tempo di riordino tra un appuntamento e l'altro, regolamento, nota sulla caparra: tutto si cambia dal pannello, senza chiamare nessuno.</p>
     </div>
   </section>
@@ -164,7 +164,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="salons.js"></script>
-<script src="app.js"></script>
+<script src="salons.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
