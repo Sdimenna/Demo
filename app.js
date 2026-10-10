@@ -30,8 +30,22 @@
       { cat: "Uomo", items: [
         ["Taglio uomo", 30, 20], ["Taglio e barba", 45, 28], ["Barba", 20, 12] ] },
       { cat: "Bambini", items: [ ["Taglio bambino", 30, 14] ] }
+    ],
+    barbiere: [
+      { cat: "Capelli", items: [
+        ["Taglio", 30, 18], ["Taglio e shampoo", 40, 22], ["Sfumatura", 30, 18], ["Taglio bambino", 20, 13] ] },
+      { cat: "Barba", items: [
+        ["Taglio e barba", 45, 28], ["Barba", 20, 12], ["Rasatura tradizionale", 30, 18] ] }
+    ],
+    unghie: [
+      { cat: "Mani", items: [
+        ["Manicure", 30, 18], ["Semipermanente", 60, 30], ["Ricostruzione in gel", 120, 55],
+        ["Refill", 90, 40], ["Nail art", 30, 10] ] },
+      { cat: "Piedi", items: [
+        ["Pedicure estetico", 50, 32], ["Semipermanente piedi", 60, 35] ] }
     ]
-  }[KIND];
+  }[salon.menu || KIND];
+  const MENU = salon.menu || KIND;
   const ALL = SERVICES.flatMap(g => g.items.map(([name, dur, price]) => ({ cat: g.cat, name, dur, price })));
   ALL.forEach((s, i) => s.id = i);
 
@@ -98,7 +112,7 @@
         if (r() < fill) {
           const svc = ALL[Math.floor(r() * ALL.length)];
           if (t + svc.dur <= end) {
-            const male = KIND === "parrucchiere" && svc.cat === "Uomo";
+            const male = MENU === "barbiere" || (KIND === "parrucchiere" && svc.cat === "Uomo");
             const pool = male ? CLIENTS_M : CLIENTS;
             const online = r() < 0.62;
             const createdH = online ? [7, 8, 12, 13, 20, 21, 22, 23, 10, 15][Math.floor(r()*10)] : 10 + Math.floor(r()*8);
@@ -140,15 +154,18 @@
 
   /* ================= Sito ================= */
   function renderSite() {
-    const kindLabel = KIND === "estetica" ? "Centro estetico" : "Parrucchiere";
+    const kindLabel = { estetica: "Centro estetico", parrucchiere: "Parrucchiere", barbiere: "Barbiere", unghie: "Centro unghie" }[MENU];
     document.documentElement.dataset.kind = KIND;
     document.title = `${salon.name} · Prenota online`;
     $("#brand-small").textContent = salon.name;
     $("#hero-name").textContent = salon.name;
     $("#hero-kicker").textContent = salon.city ? `${kindLabel} a ${salon.city}` : kindLabel;
-    $("#hero-lead").textContent = KIND === "estetica"
-      ? "Prenota il tuo trattamento quando vuoi, anche mentre siamo in cabina."
-      : "Prenota taglio, colore e piega quando vuoi, senza telefonare.";
+    $("#hero-lead").textContent = {
+      estetica: "Prenota il tuo trattamento quando vuoi, anche mentre siamo in cabina.",
+      parrucchiere: "Prenota taglio, colore e piega quando vuoi, senza telefonare.",
+      barbiere: "Prenota taglio e barba quando vuoi, senza telefonare e senza attese.",
+      unghie: "Prenota manicure, gel e semipermanente quando vuoi, anche mentre siamo al lavoro."
+    }[MENU];
     $("#foot-name").textContent = salon.name;
     $("#admin-name").textContent = salon.name;
 
