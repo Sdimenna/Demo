@@ -120,6 +120,9 @@ window.SALONS = {
   andreabeautyspa: { name: "Andrea Beauty Spa", kind: "estetica", city: "Marostica" },
   elenapozzan: { name: "Elena Pozzan", kind: "estetica", city: "Marostica" },
 
+  // ---- Segnalazioni ----
+  opera: { name: "Opera Parrucchiere", kind: "parrucchiere", city: "Schio" },
+
   // Demo generiche (senza nome di un salone reale)
   estetica:     { name: "Il tuo centro estetico", kind: "estetica",     city: "", generic: true },
   parrucchiere: { name: "Il tuo salone",          kind: "parrucchiere", city: "", generic: true },
