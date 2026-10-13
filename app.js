@@ -4,7 +4,7 @@
   /* ================= Configurazione ================= */
   const params = new URLSearchParams(location.search);
   const slug = (params.get("s") || "").toLowerCase();
-  const TIPI = ["estetica", "parrucchiere", "barbiere", "unghie", "toelettatura", "fisioterapia", "tatuaggi", "gommista"];
+  const TIPI = ["estetica", "parrucchiere", "barbiere", "unghie", "toelettatura", "fisioterapia", "tatuaggi", "gommista", "tricologia"];
   const fallbackKind = TIPI.includes(params.get("tipo")) ? params.get("tipo") : "estetica";
   const salon = window.SALONS[slug] || window.SALONS[fallbackKind];
   const key = window.SALONS[slug] ? slug : fallbackKind;
@@ -74,6 +74,13 @@
       { cat: "Piercing", items: [
         ["Piercing lobo", 15, 30], ["Piercing cartilagine", 20, 40] ] }
     ],
+    tricologia: [
+      { cat: "Consulenza", items: [
+        ["Prima consulenza tricologica", 45, 50], ["Analisi del cuoio capelluto (tricoscopia)", 30, 40], ["Visita di controllo", 30, 30] ] },
+      { cat: "Trattamenti", items: [
+        ["Trattamento anticaduta", 45, 55], ["Trattamento cute grassa o forfora", 45, 50],
+        ["Trattamento rinforzante", 40, 45], ["Ciclo di 6 trattamenti", 45, 290] ] }
+    ],
     gommista: [
       { cat: "Cambio gomme", items: [
         ["Cambio gomme stagionale", 30, 40], ["Cambio gomme con deposito", 30, 60], ["Montaggio gomme nuove", 45, 45] ] },
@@ -94,6 +101,8 @@
                 4: [["09:00","19:00"]], 5: [["08:30","12:30"],["14:30","19:00"]], 6: [["08:00","17:00"]] },
     toelettatura: { 0: [], 1: [], 2: [["08:30","12:30"],["14:30","18:30"]], 3: [["08:30","12:30"],["14:30","18:30"]],
                 4: [["08:30","12:30"],["14:30","18:30"]], 5: [["08:30","12:30"],["14:30","18:30"]], 6: [["08:30","12:30"]] },
+    tricologia: { 0: [], 1: [], 2: [["09:00","12:30"],["14:30","19:00"]], 3: [["09:00","12:30"],["14:30","19:00"]],
+                4: [["09:00","12:30"],["14:30","19:00"]], 5: [["09:00","12:30"],["14:30","19:00"]], 6: [["09:00","12:30"]] },
     fisioterapia: { 0: [], 1: [["08:00","13:00"],["14:00","20:00"]], 2: [["08:00","13:00"],["14:00","20:00"]], 3: [["08:00","13:00"],["14:00","20:00"]],
                 4: [["08:00","13:00"],["14:00","20:00"]], 5: [["08:00","13:00"],["14:00","19:00"]], 6: [] },
     tatuaggi: { 0: [], 1: [], 2: [["10:00","13:00"],["14:30","19:30"]], 3: [["10:00","13:00"],["14:30","19:30"]],
@@ -112,6 +121,7 @@
     toelettatura: { label: "Toelettatura", lead: "Prenota il bagno o la toelettatura del tuo cane quando vuoi, anche mentre abbiamo le mani nel sapone.", place: "negozio", the: "Il negozio", del: "del negozio", clients: "I clienti", client: "al cliente", menuTitle: "Servizi e prezzi", what: "servizio", q1: "Cosa prenotiamo per il tuo cane?", notes: "Nome, razza e taglia del cane", ph: "Es. Luna, barboncino, taglia piccola" },
     fisioterapia: { label: "Studio di fisioterapia", lead: "Prenota la tua seduta quando vuoi, senza chiamare mentre siamo con un paziente.", place: "studio", the: "Lo studio", del: "dello studio", clients: "I pazienti", client: "al paziente", menuTitle: "Trattamenti e tariffe", what: "trattamento", q1: "Cosa vuoi prenotare?", notes: "Motivo della visita (facoltativo)", ph: "Es. dolore lombare da due settimane" },
     tatuaggi:     { label: "Studio di tatuaggi", lead: "Prenota la consulenza o la tua sessione, con l'idea già descritta.", place: "studio", the: "Lo studio", del: "dello studio", clients: "I clienti", client: "al cliente", menuTitle: "Lavori e prezzi", what: "appuntamento", q1: "Cosa vuoi prenotare?", notes: "Descrivi la tua idea", ph: "Soggetto, zona del corpo, misura indicativa", from: true },
+    tricologia:   { label: "Studio di tricologia", lead: "Prenota la consulenza o il tuo trattamento quando vuoi, senza dover chiamare.", place: "studio", the: "Lo studio", del: "dello studio", clients: "I clienti", client: "al cliente", menuTitle: "Consulenze e trattamenti", what: "trattamento", q1: "Cosa vuoi prenotare?", notes: "Cosa ti preoccupa? (facoltativo)", ph: "Es. caduta da qualche mese, cute che prude" },
     gommista:     { label: "Gommista", lead: "Prenota il cambio gomme in pochi secondi, senza fare la coda al telefono.", place: "officina", the: "L'officina", del: "dell'officina", clients: "I clienti", client: "al cliente", menuTitle: "Servizi e prezzi", what: "servizio", q1: "Cosa ti serve?", notes: "Targa e modello dell'auto", ph: "Es. AB123CD, Fiat Panda" }
   };
   const SECT = SECT_ALL[MENU] || SECT_ALL[KIND];
@@ -177,7 +187,7 @@
           const svc = ALL[Math.floor(r() * ALL.length)];
           if (t + svc.dur <= end) {
             const male = MENU === "barbiere" || (KIND === "parrucchiere" && svc.cat === "Uomo");
-            const pool = male ? CLIENTS_M : ["toelettatura","fisioterapia","tatuaggi","gommista"].includes(MENU) ? CLIENTS_MIX : CLIENTS;
+            const pool = male ? CLIENTS_M : ["toelettatura","fisioterapia","tatuaggi","gommista","tricologia"].includes(MENU) ? CLIENTS_MIX : CLIENTS;
             const person = pool[Math.floor(r() * pool.length)];
             const who = MENU === "toelettatura" ? `${DOGS[Math.floor(r() * DOGS.length)]} (${person})`
               : MENU === "gommista" ? `${person}, ${CARS[Math.floor(r() * CARS.length)]}` : person;

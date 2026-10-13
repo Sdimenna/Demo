@@ -118,7 +118,7 @@ window.SALONS = {
   erika: { name: "Studio Estetico Erika", kind: "estetica", city: "Colceresa" },
   fisiomat: { name: "Fisiomat", kind: "fisioterapia", city: "Villaverla" },
   andreabeautyspa: { name: "Andrea Beauty Spa", kind: "estetica", city: "Marostica" },
-  elenapozzan: { name: "Elena Pozzan", kind: "estetica", city: "Marostica" },
+  elenapozzan: { name: "Elena Pozzan", kind: "fisioterapia", menu: "tricologia", city: "Marostica" },
 
   // ---- Altri ----
   opera: { name: "Opera Parrucchiere", kind: "parrucchiere", city: "Schio" },
